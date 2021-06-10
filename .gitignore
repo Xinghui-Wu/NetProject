@@ -1,3 +1,10 @@
+# IDEs and editors
+.idea/
+.vscode/
+
+# Paper meta information of the cit-HepTH dataset
+dataset/cit-Hepth-abstracts
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
