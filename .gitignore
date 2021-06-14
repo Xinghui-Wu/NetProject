@@ -3,7 +3,7 @@
 .vscode/
 
 # Paper meta information of the cit-HepTH dataset
-dataset/cit-Hepth-abstracts
+dataset/cit-HepTh-abstracts
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
