@@ -129,10 +129,10 @@ if __name__ == "__main__":
         acc=random_forest(train_x,train_y,val_x,val_y)
     elif args.method=='bayes':
         acc=naive_bayes(train_x,train_y,val_x,val_y)
-    elif args.method=='svm-l':
-        acc=support_vector_machine(train_x,train_y,val_x,val_y,method='rbf')
     elif args.method=='svm-rbf':
         acc=support_vector_machine(train_x,train_y,val_x,val_y,method='rbf')
+    elif args.method=='svm-sigmoid':
+        acc=support_vector_machine(train_x,train_y,val_x,val_y,method='sigmoid')
     elif args.method=='logi':
         acc=logistic_regression(train_x,train_y,val_x,val_y)
     elif args.method=='tree':
