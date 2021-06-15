@@ -54,3 +54,16 @@ def get_datasets(dataset="cit-HepTh", shuffle=True, proportion=(0.7, 0.2)):
         tuple: 训练集、验证集、测试集
     """
 ```
+
+### 分类预测
+&emsp;&emsp;实验中使用6种分类算法共计七个实现对提取到的特征数据进行预测，算法包括随机森林“Random Forest”, 贝叶斯分类器，决策树分类器“Dicision Tree”，支持向量机“SVM”（kernel=rbf、sigmoid），Logistic回归“Logistic Regression”，神经网络“Neural Network”.
+
+&emsp;&emsp;classification模块下的classification.py脚本提供了各个分类算法的接口，在repo的主目录可以直接调用该脚本进行预测。使用方法如下：
+```
+python -d your_dataset_name -m all -sp your_result_save_path
+```
+
+&emsp;&emsp;其中 -m 后的参数指定了使用的算法，'all'即使用所有算法，其他的算法调用对应参数可见的classification.py脚本。
+注意，各个分类方法的必要输入仅为训练输入与标签，测试输入与标签。该输入与标签可以通过脚本内的sort_data()函数从get_datasets()的输出中直接得到。分类方法的输出结果包括在测试集上的accuracy以及整个算法运行的时间消耗。这些输出也会写入-sp指定路径的csv表格中。
+
+&emsp;&emsp;目前根据已有的数据集运行的各个算法的accuracy以及time cost均记录在classification模块下[表格1](./classification/HepPh-result.csv)以及[表格2](./classification/HepTh-result.csv)中
