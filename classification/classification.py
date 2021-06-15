@@ -85,16 +85,7 @@ def naive_bayes(train_x,train_y,val_x,val_y,var_smoothing=1e-8):
     return acc
 
 @print_run_time
-def logistic_regression(train_x,train_y,val_x,val_y,C=1.0, random_state=0):
-    # from sklearn.preprocessing import StandardScaler
-    # sc = StandardScaler()
-    # sc.fit(X_train)
-    # X_train_std = sc.transform(X_train)
-    # X_test_std = sc.transform(X_test)
-
-    # X_combined_std = np.vstack((X_train_std, X_test_std))
-    # y_combined = np.hstack((y_train, y_test))
-    
+def logistic_regression(train_x,train_y,val_x,val_y,C=1.0, random_state=0):  
     clf = LogisticRegression(C=C, random_state=random_state)
     clf.fit(train_x, train_y)
     pred = clf.predict(val_x)
@@ -151,15 +142,15 @@ if __name__ == "__main__":
     elif args.method=='nn':
         acc=neural_network(train_x,train_y,val_x,val_y)
     elif args.method=='all':
-        # acc_bayes=naive_bayes(train_x,train_y,val_x,val_y) #0.25
-        # acc_rf=random_forest(train_x,train_y,val_x,val_y) # 0.44-10depth
-        # acc_logi=logistic_regression(train_x,train_y,val_x,val_y)#0.45
-        # acc_tree=decision_tree(train_x,train_y,val_x,val_y)#0.42
-        # acc_nn=neural_network(train_x,train_y,val_x,val_y) # 0.4043
+        acc_bayes=naive_bayes(train_x,train_y,val_x,val_y) #0.25
+        acc_rf=random_forest(train_x,train_y,val_x,val_y) # 0.44-10depth
+        acc_logi=logistic_regression(train_x,train_y,val_x,val_y)#0.45
+        acc_tree=decision_tree(train_x,train_y,val_x,val_y)#0.42
+        acc_nn=neural_network(train_x,train_y,val_x,val_y) # 0.4043
         acc_svm_rbf=support_vector_machine(train_x,train_y,val_x,val_y,method='rbf')
         acc_svm_sigmoid=support_vector_machine(train_x,train_y,val_x,val_y,method='sigmoid')
 
-    # tmp_path=os.path.abspath('./classification/tmp.csv')
-    # os.rename('./classification/tmp.csv',args.save_path)
+    tmp_path=os.path.abspath('./classification/tmp.csv')
+    os.rename('./classification/tmp.csv',args.save_path)
 
     print(1)
