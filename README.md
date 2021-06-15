@@ -65,3 +65,5 @@ python -d your_dataset_name -m all -sp your_result_save_path
 
 &emsp;&emsp;其中 -m 后的参数指定了使用的算法，'all'即使用所有算法，其他的算法调用对应参数可见的classification.py脚本。
 注意，各个分类方法的必要输入仅为训练输入与标签，测试输入与标签。该输入与标签可以通过脚本内的sort_data()函数从get_datasets()的输出中直接得到。分类方法的输出结果包括在测试集上的accuracy以及整个算法运行的时间消耗。这些输出也会写入-sp指定路径的csv表格中。
+
+&emsp;&emsp;目前根据已有的数据集运行的各个算法的accuracy以及time cost均记录在classification模块下[表格1](./classification/HepPh-result.csv)以及[表格2](./classification/HepTh-result.csv)中
