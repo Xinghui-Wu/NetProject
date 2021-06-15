@@ -7,20 +7,18 @@ Description: In User Settings Edit
 FilePath: /NetProject/classification/classification.py
 '''
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import sys
 sys.path.append('./feature/')
 sys.path.append('./classification/')
 import feature_extraction as fe
 import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 import time
 from utils import *
 
 from sklearn import datasets,svm
 from sklearn.tree import DecisionTreeClassifier
-# from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
