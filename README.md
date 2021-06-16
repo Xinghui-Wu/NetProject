@@ -161,15 +161,18 @@ G_dblp=dataset_mine.G_return(dblp_path)#返回的是一个图G
 
 &emsp;&emsp;feature模块下的feature_extraction.py脚本提供了用于特征提取和数据集获取的接口。该脚本文件为每个函数都提供了比较详细的pydoc文档说明。此处，仅提供顶层接口的输入输出和调用说明，省略对后续分类、聚类、预测等机器学习任务透明的其它函数的说明。
 
-&emsp;&emsp;如下所示，get_datasets()接口接受数据集名称（注意大小写）、是否打乱数据集顺序以及训练集和验证集的划分比例元组（其余部分作为测试集）作为输入，直接返回按照指定比例划分好的训练集、验证集和测试集。每个子集均为一个列表，由若干论文样本组成，每个元素对应于一个论文样本的特征向量和标签元组。
+&emsp;&emsp;如下所示，get_datasets()接口接受数据集名称（注意大小写）、机器学习任务类型、特征类型、是否打乱数据集顺序以及训练集和验证集的划分比例元组（其余部分作为测试集）作为输入，直接返回按照指定比例划分好的训练集、验证集和测试集。每个子集均为一个列表，由若干论文样本组成，每个元素对应于一个论文样本的特征向量和标签元组。
 
 ```python
-def get_datasets(dataset="cit-HepTh", shuffle=True, proportion=(0.7, 0.2)):
-    """指定数据集名称，获取指定比例的训练集、验证集和测试集
-    每个子集均为一个列表，列表中的每个元素对应于一个论文样本的特征向量和标签元组，即(feature_vector, label)
+def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, proportion=(0.7, 0.2)):
+    """指定数据集名称、机器学习任务类型、样本特征类型，获取指定比例的训练集、验证集和测试集
+    对于节点分类和聚类任务，每个子集均为一个列表，列表中的每个元素对应于一个论文样本的特征向量和标签元组，即(feature_vector, label)
+    对于链接预测任务，每个子集均为一个列表，列表中的每个元素对应于一对论文样本的特征向量和有无有向边的标签元组，即(feature_vector_i, feature_vector_j, 0/1)
 
     Args:
         dataset (str, optional): 数据集名称，cit-HepTh或cit-HepPh（注意大小写）. Defaults to "cit-HepTh".
+        task (int, optional): 机器学习任务类型，0表示节点分类和聚类，1表示链接预测. Defaults to 0.
+        feature_type (int, optional): 特征类型，0表示文本特征，1表示网络结构特征，2表示混合特征. Defaults to 0.
         shuffle (bool, optional): 是否打乱数据集顺序. Defaults to True.
         proportion (tuple, optional): 训练集和验证集的比例. Defaults to (0.7, 0.2).
 
