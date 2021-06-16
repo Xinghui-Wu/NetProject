@@ -108,15 +108,18 @@ def neural_network(train_x,train_y,val_x,val_y,epoch=10):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("-d", "--dataset", type=str, default="cit-HepPh", help="")
+    parser.add_argument("-d", "--dataset", type=str, default="cit-HepTh", help="")
+    parser.add_argument("-t", "--task", type=int, default=0, help="")
+    parser.add_argument("-f", "--feature_type", type=int, default=0, help="")
     parser.add_argument("-s", "--shuffle", type=bool, default=True, help="")
     parser.add_argument("-p", "--proportion", type=tuple, default=(0.7, 0.3), help="")
 
     parser.add_argument("-m", "--method", type=str, default='all',choices=['rf','bayes','svm-l','svm-rbf','logi','tree','nn','all'], help="")
     parser.add_argument("-sp", "--save_path", type=str, default='./classification/HepPh-result.csv', help="")  
     args = parser.parse_args()
-
-    training_set, validation_set, test_set = fe.get_datasets(dataset=args.dataset, shuffle=args.shuffle, proportion=args.proportion)
+  
+    training_set, validation_set, test_set = fe.get_datasets(dataset=args.dataset, task=args.task, feature_type=args.feature_type, 
+                                                          shuffle=args.shuffle, proportion=args.proportion)
 
     train_x,train_y=sort_data(training_set)
     val_x,val_y=sort_data(validation_set)
