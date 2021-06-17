@@ -55,7 +55,7 @@ def build_model(input_dim, class_num, weight_decay=0.0001, dense_units=128):
     model.compile(optimizer='adam',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-    model.save('./classification/model.h5')
+    model.save('./link/model.h5')
     return model
 
 
