@@ -1,6 +1,5 @@
 import argparse
 import os
-import math
 import random
 
 import numpy as np
@@ -45,8 +44,14 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
     Returns:
         tuple: 训练集、验证集、测试集
     """
+    # 获取全部论文的元信息
+    paper_dict = get_all_meta_info()
     # 文本特征提取
-    paper_dict = extract_text_features()
+    if feature_type != 1:
+        paper_dict = extract_text_features(paper_dict)
+    # 网络结构特征提取
+    if feature_type != 0:
+        paper_dict = extract_network_features(paper_dict, dataset)
     # 获取混合数据集
     datasets = get_paper_citation_network(paper_dict, dataset, task, feature_type)
 
@@ -60,36 +65,6 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
     test_set = datasets[int((proportion[0] + proportion[1]) * len(datasets)): ]
 
     return training_set, validation_set, test_set
-
-
-def extract_text_features():
-    """TF-IDF文本特征提取
-
-    Returns:
-        dict: 论文字典
-    """
-    # 获取全部论文的元信息
-    paper_dict = get_all_meta_info()
-    # 论文字典ID列表
-    id_list = list(paper_dict.keys())
-
-    # 论文摘要文本语料库
-    corpus = list()
-
-    for id in id_list:
-        paper = paper_dict[id]
-        corpus.append(paper.abstract)
-    
-    # 提取TF-IDF文本特征矩阵
-    vectorizer = TfidfVectorizer()
-    feature_matrix = vectorizer.fit_transform(corpus).toarray()
-
-    # 设置每个论文样本的文本特征向量
-    for i in range(len(id_list)):
-        paper = paper_dict[id_list[i]]
-        paper.text_feature = feature_matrix[i]
-    
-    return paper_dict
 
 
 def get_all_meta_info():
@@ -139,6 +114,63 @@ def get_paper_meta_info(id, abs_path):
     abstract = abstract.replace("\n", " ")
     
     return Paper(id, abstract)
+
+
+def extract_text_features(paper_dict):
+    """TF-IDF文本特征提取
+
+    Args:
+        paper_dict (dict): 论文字典
+
+    Returns:
+        dict: 包含文本特征的论文字典
+    """
+    # 论文字典ID列表
+    id_list = list(paper_dict.keys())
+
+    # 论文摘要文本语料库
+    corpus = list()
+
+    for id in id_list:
+        paper = paper_dict[id]
+        corpus.append(paper.abstract)
+    
+    # 提取TF-IDF文本特征矩阵
+    vectorizer = TfidfVectorizer()
+    feature_matrix = vectorizer.fit_transform(corpus).toarray()
+
+    # 设置每个论文样本的文本特征向量
+    for i in range(len(id_list)):
+        paper = paper_dict[id_list[i]]
+        paper.text_feature = feature_matrix[i]
+    
+    return paper_dict
+
+
+def extract_network_features(paper_dict, dataset):
+    """网络结构特征提取
+
+    Args:
+        paper_dict (dict): 论文字典
+        dataset (str): 数据集名称，cit-HepTh或cit-HepPh（注意大小写）
+
+    Returns:
+        dict: 包含网络结构特征的论文字典
+    """
+    with open("./results/{}-DeepWalk.txt".format(dataset), 'r') as deepwalk_result_txt:
+        deepwalk_result = deepwalk_result_txt.readlines()
+        deepwalk_result = deepwalk_result[1: ]
+    
+    for line in deepwalk_result:
+        line = line[: -1]
+        partition = line.split(' ')
+        paper_id = partition[0]
+
+        if paper_id in paper_dict:
+            paper = paper_dict[paper_id]
+            paper.network_feature = np.array(partition[1: ], dtype=float)
+    
+    return paper_dict
 
 
 def get_paper_citation_network(paper_dict, dataset, task, feature_type):
