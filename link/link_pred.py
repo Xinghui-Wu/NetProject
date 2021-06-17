@@ -128,7 +128,7 @@ if __name__ == "__main__":
                         type=str,
                         default="cit-HepPh",
                         help="")
-    parser.add_argument("-t", "--task", type=int, default=0, help="")
+    parser.add_argument("-t", "--task", type=int, default=1, help="")
     parser.add_argument("-s", "--shuffle", type=bool, default=True, help="")
     parser.add_argument("-f", "--feature_type", type=int, default=0, help="")
     parser.add_argument("-p",

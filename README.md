@@ -1,6 +1,5 @@
 # NetProject
 
-
 ## 环境配置
 
 &emsp;&emsp;建议使用conda或viturlenv创建Python虚拟环境，启动该虚拟环境后，在项目根目录下，输入以下命令来配置环境。
@@ -26,7 +25,6 @@
 
 * 网络级别特征分析：网络直径（diameter）、网络连通块（connected components）分析统计等。
 
-
 ### 图G的获取：
 
 导入dataset下的dataset_mine包，使用其中的函数G_return(path)即可，如
@@ -36,8 +34,6 @@ from dataset import dataset_mine
 dblp_path='../dataset/com-dblp.ungraph.txt'
 G_dblp=dataset_mine.G_return(dblp_path)#返回的是一个图G
 ~~~
-
-
 
 ### 关于图的分析函数
 
@@ -161,10 +157,10 @@ G_dblp=dataset_mine.G_return(dblp_path)#返回的是一个图G
 
 &emsp;&emsp;feature模块下的feature_extraction.py脚本提供了用于特征提取和数据集获取的接口。该脚本文件为每个函数都提供了比较详细的pydoc文档说明。此处，仅提供顶层接口的输入输出和调用说明，省略对后续分类、聚类、预测等机器学习任务透明的其它函数的说明。
 
-&emsp;&emsp;如下所示，get_datasets()接口接受数据集名称（注意大小写）、机器学习任务类型、特征类型、是否打乱数据集顺序以及训练集和验证集的划分比例元组（其余部分作为测试集）作为输入，直接返回按照指定比例划分好的训练集、验证集和测试集。每个子集均为一个列表，由若干论文样本组成，每个元素对应于一个论文样本的特征向量和标签元组。
+&emsp;&emsp;如下所示，get_datasets()接口接受数据集名称（注意大小写）、机器学习任务类型、特征类型、标签类型、是否打乱数据集顺序以及训练集和验证集的划分比例元组（其余部分作为测试集）作为输入，直接返回按照指定比例划分好的训练集、验证集和测试集。每个子集均为一个列表，由若干论文样本组成，每个元素对应于一个论文样本的特征向量和标签元组。
 
 ```python
-def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, proportion=(0.7, 0.2)):
+def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, label_type=2, shuffle=True, proportion=(0.7, 0.2)):
     """指定数据集名称、机器学习任务类型、样本特征类型，获取指定比例的训练集、验证集和测试集
     对于节点分类和聚类任务，每个子集均为一个列表，列表中的每个元素对应于一个论文样本的特征向量和标签元组，即(feature_vector, label)
     对于链接预测任务，每个子集均为一个列表，列表中的每个元素对应于一对论文样本的特征向量和有无有向边的标签元组，即(feature_vector_i, feature_vector_j, 0/1)
@@ -173,6 +169,7 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
         dataset (str, optional): 数据集名称，cit-HepTh或cit-HepPh（注意大小写）. Defaults to "cit-HepTh".
         task (int, optional): 机器学习任务类型，0表示节点分类和聚类，1表示链接预测. Defaults to 0.
         feature_type (int, optional): 特征类型，0表示文本特征，1表示网络结构特征，2表示混合特征. Defaults to 0.
+        label_type (int, optional): 标签类型，1表示对数标签划分，2表示二分类标签划分. Defaults to 2.
         shuffle (bool, optional): 是否打乱数据集顺序. Defaults to True.
         proportion (tuple, optional): 训练集和验证集的比例. Defaults to (0.7, 0.2).
 
@@ -182,6 +179,7 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
 ```
 
 ### 分类预测
+
 &emsp;&emsp;实验中使用6种分类算法共计七个实现对提取到的特征数据进行预测，算法包括随机森林“Random Forest”, 贝叶斯分类器，决策树分类器“Dicision Tree”，支持向量机“SVM”（kernel=rbf、sigmoid），Logistic回归“Logistic Regression”，神经网络“Neural Network”.
 
 &emsp;&emsp;classification模块下的classification.py脚本提供了各个分类算法的接口，在repo的主目录可以直接调用该脚本进行预测。使用方法如下：
@@ -193,3 +191,21 @@ python -d your_dataset_name -m all -sp your_result_save_path
 注意，各个分类方法的必要输入仅为训练输入与标签，测试输入与标签。该输入与标签可以通过脚本内的sort_data()函数从get_datasets()的输出中直接得到。分类方法的输出结果包括在测试集上的accuracy以及整个算法运行的时间消耗。这些输出也会写入-sp指定路径的csv表格中。
 
 &emsp;&emsp;目前根据已有的数据集运行的各个算法的accuracy以及time cost均记录在classification模块下[表格1](./classification/HepPh-result.csv)以及[表格2](./classification/HepTh-result.csv)中
+
+### 链路预测
+
+运行环境：Win10 + python3.7.9
+运行依赖环境可以启动虚拟环境：**虚拟环境目录**：[项目主目录]/env
+
+**启动虚拟环境**:
+```shell
+PS D:\MyCode_py\NetProject-main> ./env/Scripts/activate
+```
+**运行示例**：
+```shell
+(env) PS D:\MyCode_py\NetProject-main> python D:\MyCode_py\NetProject-main\link\link_pred.py -t 1 -d cit-HepPh
+```
+**退出虚拟环境**：
+```shell
+(env) PS D:\MyCode_py\NetProject-main> deactivate
+```

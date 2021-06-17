@@ -1,5 +1,6 @@
 import argparse
 import os
+import math
 import random
 
 import numpy as np
@@ -16,20 +17,22 @@ class Paper:
         self.num_citations = 0
 
 
-    def set_label(self):
-        # if self.num_citations == 0:
-        #     self.label = 0
-        # else:
-        #     self.label = round(math.log10(self.num_citations)) + 1
-        
+    def set_label(self, label_type):
+        # 对数分类
+        if label_type == 1:
+            if self.num_citations == 0:
+                self.label = 0
+            else:
+                self.label = round(math.log10(self.num_citations)) + 1
         # 二分类
-        if self.num_citations <= 5:
-            self.label = 0
         else:
-            self.label = 1
+            if self.num_citations <= 5:
+                self.label = 0
+            else:
+                self.label = 1
 
 
-def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, proportion=(0.7, 0.2)):
+def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, label_type=2, shuffle=True, proportion=(0.7, 0.2)):
     """指定数据集名称、机器学习任务类型、样本特征类型，获取指定比例的训练集、验证集和测试集
     对于节点分类和聚类任务，每个子集均为一个列表，列表中的每个元素对应于一个论文样本的特征向量和标签元组，即(feature_vector, label)
     对于链接预测任务，每个子集均为一个列表，列表中的每个元素对应于一对论文样本的特征向量和有无有向边的标签元组，即(feature_vector_i, feature_vector_j, 0/1)
@@ -38,6 +41,7 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
         dataset (str, optional): 数据集名称，cit-HepTh或cit-HepPh（注意大小写）. Defaults to "cit-HepTh".
         task (int, optional): 机器学习任务类型，0表示节点分类和聚类，1表示链接预测. Defaults to 0.
         feature_type (int, optional): 特征类型，0表示文本特征，1表示网络结构特征，2表示混合特征. Defaults to 0.
+        label_type (int, optional): 标签类型，1表示对数标签划分，2表示二分类标签划分. Defaults to 2.
         shuffle (bool, optional): 是否打乱数据集顺序. Defaults to True.
         proportion (tuple, optional): 训练集和验证集的比例. Defaults to (0.7, 0.2).
 
@@ -53,7 +57,7 @@ def get_datasets(dataset="cit-HepTh", task=0, feature_type=0, shuffle=True, prop
     if feature_type != 0:
         paper_dict = extract_network_features(paper_dict, dataset)
     # 获取混合数据集
-    datasets = get_paper_citation_network(paper_dict, dataset, task, feature_type)
+    datasets = get_paper_citation_network(paper_dict, dataset, task, feature_type, label_type)
 
     # 打乱数据集顺序
     if shuffle:
@@ -164,7 +168,7 @@ def extract_network_features(paper_dict, dataset):
     for line in deepwalk_result:
         line = line[: -1]
         partition = line.split(' ')
-        paper_id = partition[0]
+        paper_id = partition[0].zfill(7)
 
         if paper_id in paper_dict:
             paper = paper_dict[paper_id]
@@ -173,7 +177,7 @@ def extract_network_features(paper_dict, dataset):
     return paper_dict
 
 
-def get_paper_citation_network(paper_dict, dataset, task, feature_type):
+def get_paper_citation_network(paper_dict, dataset, task, feature_type, label_type):
     """获取论文引用网络信息（真实节点和边）
     对于节点分类和聚类任务，为论文样本标记标签；对于链接预测任务，为一对论文样本的引用关系标记标签
     根据指定的特征类型，返回混合数据集
@@ -183,6 +187,7 @@ def get_paper_citation_network(paper_dict, dataset, task, feature_type):
         dataset (str): 数据集名称，cit-HepTh或cit-HepPh（注意大小写）
         task (int): 机器学习任务类型，0表示节点分类和聚类，1表示链接预测. Defaults to 0.
         feature_type (int): 特征类型，0表示文本特征，1表示网络结构特征，2表示混合特征
+        label_type (int): 标签类型，1表示对数标签划分，2表示二分类标签划分
 
     Returns:
         list: 混合数据集，每个元素由单个论文样本或一对论文样本的特征向量和标签元组构成
@@ -218,13 +223,13 @@ def get_paper_citation_network(paper_dict, dataset, task, feature_type):
     if task == 0:
         for paper_id in paper_set:
             paper = paper_dict[paper_id]
-            paper.set_label()
+            paper.set_label(label_type)
             if feature_type == 0:
                 datasets.append((paper.text_feature, paper.label))
             elif feature_type == 1:
                 datasets.append((paper.network_feature, paper.label))
             else:
-                paper.mix_feature = np.concatenate(paper.text_feature, paper.network_feature)
+                paper.mix_feature = np.concatenate((paper.text_feature, paper.network_feature))
                 datasets.append((paper.mix_feature, paper.label))
     else:
         paper_list = list(paper_set)
@@ -254,8 +259,8 @@ def get_paper_citation_network(paper_dict, dataset, task, feature_type):
             elif feature_type == 1:
                 datasets.append((from_paper.network_feature, to_paper.network_feature, label))
             else:
-                from_paper.mix_feature = np.concatenate(from_paper.text_feature, from_paper.network_feature)
-                to_paper.mix_feature = np.concatenate(to_paper.text_feature, to_paper.network_feature)
+                from_paper.mix_feature = np.concatenate((from_paper.text_feature, from_paper.network_feature))
+                to_paper.mix_feature = np.concatenate((to_paper.text_feature, to_paper.network_feature))
                 datasets.append((from_paper.mix_feature, to_paper.mix_feature, label))
     
     return datasets
@@ -266,10 +271,12 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dataset", type=str, default="cit-HepTh", help="")
     parser.add_argument("-t", "--task", type=int, default=0, help="")
     parser.add_argument("-f", "--feature_type", type=int, default=0, help="")
+    parser.add_argument("-l", "--label_type", type=int, default=2, help="")
     parser.add_argument("-s", "--shuffle", type=bool, default=True, help="")
     parser.add_argument("-p", "--proportion", type=tuple, default=(0.7, 0.2), help="")
 
     args = parser.parse_args()
 
-    training_set, validation_set, test_set = get_datasets(dataset=args.dataset, task=args.task, feature_type=args.feature_type, 
+    training_set, validation_set, test_set = get_datasets(dataset=args.dataset, task=args.task, 
+                                                          feature_type=args.feature_type, label_type=args.label_type, 
                                                           shuffle=args.shuffle, proportion=args.proportion)
