@@ -111,6 +111,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dataset", type=str, default="cit-HepTh", help="")
     parser.add_argument("-t", "--task", type=int, default=0, help="")
     parser.add_argument("-f", "--feature_type", type=int, default=0, help="")
+    parser.add_argument("-l", "--label_type", type=int, default=2, help="")
     parser.add_argument("-s", "--shuffle", type=bool, default=True, help="")
     parser.add_argument("-p", "--proportion", type=tuple, default=(0.7, 0.3), help="")
 
@@ -118,8 +119,9 @@ if __name__ == "__main__":
     parser.add_argument("-sp", "--save_path", type=str, default='./classification/HepPh-result.csv', help="")  
     args = parser.parse_args()
   
-    training_set, validation_set, test_set = fe.get_datasets(dataset=args.dataset, task=args.task, feature_type=args.feature_type, 
-                                                          shuffle=args.shuffle, proportion=args.proportion)
+    training_set, validation_set, test_set = fe.get_datasets(dataset=args.dataset, task=args.task, 
+                                                             feature_type=args.feature_type, label_type=args.label_type, 
+                                                             shuffle=args.shuffle, proportion=args.proportion)
 
     train_x,train_y=sort_data(training_set)
     val_x,val_y=sort_data(validation_set)
