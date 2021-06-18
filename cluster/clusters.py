@@ -120,7 +120,7 @@ def MBK(train_x,train_y,num_cluster = 5):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-d", "--dataset", type=str, default="cit-HepPh", help="")
-    parser.add_argument("-t", "--task", type=int, default=1, help="")
+    parser.add_argument("-t", "--task", type=int, default=0, help="")
     parser.add_argument("-f", "--feature_type", type=int, default=0, help="")
     parser.add_argument("-l", "--label_type", type=int, default=2, help="")
     parser.add_argument("-s", "--shuffle", type=bool, default=True, help="")
